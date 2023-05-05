@@ -239,6 +239,7 @@ msg_listbox2 = make_listbox(messages_frame2)
 msg_listbox2.bind('<<ListboxSelect>>', on_selecting2)
 msg_listbox2.bind('<Double-Button-1>', on_double_clicking2)
 msg_listbox2.pack(side=tk.RIGHT, fill=tk.BOTH)
+
 #messages_frame2.pack()
 messages_frame2.grid(row=1, column=2, ipadx=10, ipady=10, padx=2, pady=2)
 
