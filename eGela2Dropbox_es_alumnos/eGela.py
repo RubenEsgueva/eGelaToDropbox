@@ -128,7 +128,6 @@ class eGela:
         progress_var.set(progress)
         progress_bar.update()
 
-
         print("\n##### 4. PETICION (Página principal de la asignatura en eGela) #####")
         #############################################
         # RELLENAR CON CODIGO DE LA PETICION HTTP
