@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import time
 import helper
 
+
 class eGela:
     _login = 0
     _cookie = ""
@@ -103,6 +104,7 @@ class eGela:
         print(metodo + " " + uri)
         print(str(respuesta.status_code) + " " + respuesta.reason)
         web_egela = respuesta.content
+        self.get_pdf_refs(web_egela, galleta)
 
         progress = 100
         progress_var.set(progress)
@@ -120,7 +122,7 @@ class eGela:
         else:
             messagebox.showinfo("Alert Message", "Login incorrect!")
 
-    def get_pdf_refs(self):
+    def get_pdf_refs(self, pag_egela, galleta):
         popup, progress_var, progress_bar = helper.progress("get_pdf_refs", "Downloading PDF list...")
         progress = 0
         progress_var.set(progress)
@@ -129,8 +131,27 @@ class eGela:
         print("\n##### 4. PETICION (Página principal de la asignatura en eGela) #####")
         #############################################
         # RELLENAR CON CODIGO DE LA PETICION HTTP
-        # Y PROCESAMIENTO DE LA RESPUESTA HTTP
-        #############################################
+        # Y PROCESAMIENTO DE LA RESPUESTA HTTP:
+
+        doc = BeautifulSoup(pag_egela, 'html.parser')
+        enlaces = doc.html.body.find_all('a')
+        # print(divs)
+        for e in enlaces:
+            if e.text == 'Sistemas Web':
+                enlace = e['href']
+                break
+
+        metodo = 'GET'
+        uri = enlace
+        cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': galleta}
+        respuesta = requests.request(metodo, uri, headers=cabeceras, allow_redirects=False)
+        print("Petición curso Sistemas Web:")
+        print("Método: " + str(metodo) + ", URI: " + str(uri))
+        codigo = respuesta.status_code
+        descripcion = respuesta.reason
+        cuerpo = respuesta.content
+        print(str(codigo) + " " + descripcion)
+        NUMERO_DE_PDF_EN_EGELA = 0
 
         progress_step = float(100.0 / len(NUMERO_DE_PDF_EN_EGELA))
 
@@ -138,8 +159,15 @@ class eGela:
         print("\n##### Analisis del HTML... #####")
         #############################################
         # ANALISIS DE LA PAGINA DEL AULA EN EGELA
-        # PARA BUSCAR PDFs
-        #############################################
+        # PARA BUSCAR PDFs:
+
+        doc = BeautifulSoup(cuerpo, 'html.parser')
+        enlaces = doc.html.body.find_all('a', {'class': 'aalink'})
+        listaPDFs = []
+        for e in enlaces:
+            if 'Fitxategia' in e.span.text and 'pdf' in e.img['src']:
+                listaPDFs.append(e['href'])
+                NUMERO_DE_PDF_EN_EGELA += 1
 
         # INICIALIZA Y ACTUALIZAR BARRA DE PROGRESO
         # POR CADA PDF ANIADIDO EN self._refs
@@ -147,10 +175,10 @@ class eGela:
         progress_step = float(100.0 / len(NUMERO_DE_PDF_EN_EGELA))
 
 
-                progress += progress_step
-                progress_var.set(progress)
-                progress_bar.update()
-                time.sleep(0.1)
+        progress += progress_step
+        progress_var.set(progress)
+        progress_bar.update()
+        time.sleep(0.1)
 
         popup.destroy()
         return self._refs
