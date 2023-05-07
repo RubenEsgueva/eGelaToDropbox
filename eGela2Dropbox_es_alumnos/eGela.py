@@ -122,7 +122,7 @@ class eGela:
         else:
             messagebox.showinfo("Alert Message", "Login incorrect!")
 
-    def get_pdf_refs(self, pag_egela, galleta):
+    def get_pdf_refs(self):
         popup, progress_var, progress_bar = helper.progress("get_pdf_refs", "Downloading PDF list...")
         progress = 0
         progress_var.set(progress)
@@ -134,17 +134,17 @@ class eGela:
         # RELLENAR CON CODIGO DE LA PETICION HTTP
         # Y PROCESAMIENTO DE LA RESPUESTA HTTP:
 
-        doc = BeautifulSoup(pag_egela, 'html.parser')
+        doc = BeautifulSoup(self._curso, 'html.parser')
         enlaces = doc.html.body.find_all('a')
         # print(divs)
         for e in enlaces:
             if e.text == 'Sistemas Web':
-                enlace = e['href']
+                self._curso = e['href']
                 break
 
         metodo = 'GET'
-        uri = enlace
-        cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': galleta}
+        uri = self._curso
+        cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': self._cookie}
         respuesta = requests.request(metodo, uri, headers=cabeceras, allow_redirects=False)
         print("Petición curso Sistemas Web:")
         print("Método: " + str(metodo) + ", URI: " + str(uri))
@@ -167,7 +167,7 @@ class eGela:
         listaPDFs = []
         for e in enlaces:
             if 'Fitxategia' in e.span.text and 'pdf' in e.img['src']:
-                listaPDFs.append(e['href'])
+                self._refs.append(e['href'])
                 NUMERO_DE_PDF_EN_EGELA += 1
 
         # INICIALIZA Y ACTUALIZAR BARRA DE PROGRESO
