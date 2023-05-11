@@ -11,6 +11,7 @@ import helper
 class eGela:
     _login = 0
     _cookie = ""
+    _webegela = ""
     _curso = ""
     _refs = []
     _root = None
@@ -46,7 +47,6 @@ class eGela:
         progress_var.set(progress)
         progress_bar.update()
         time.sleep(1)
-
 
         print("\n##### 2. PETICION #####")
         metodo = 'POST'
@@ -104,7 +104,6 @@ class eGela:
         print(metodo + " " + uri)
         print(str(respuesta.status_code) + " " + respuesta.reason)
         web_egela = respuesta.content
-        self.get_pdf_refs(web_egela, galleta)
 
         progress = 100
         progress_var.set(progress)
@@ -112,12 +111,10 @@ class eGela:
         time.sleep(1)
         popup.destroy()
 
-
         if logeado:
             self._login = 1
-            #############################################
-            # ACTUALIZAR VARIABLES
-            #############################################
+            self._cookie = galleta
+            self._webegela = web_egela
             self._root.destroy()
         else:
             messagebox.showinfo("Alert Message", "Login incorrect!")
@@ -127,7 +124,6 @@ class eGela:
         progress = 0
         progress_var.set(progress)
         progress_bar.update()
-
 
         print("\n##### 4. PETICION (Página principal de la asignatura en eGela) #####")
         #############################################
@@ -144,7 +140,8 @@ class eGela:
 
         metodo = 'GET'
         uri = self._curso
-        cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': self._cookie}
+        cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
+                     'Cookie': self._cookie}
         respuesta = requests.request(metodo, uri, headers=cabeceras, allow_redirects=False)
         print("Petición curso Sistemas Web:")
         print("Método: " + str(metodo) + ", URI: " + str(uri))
