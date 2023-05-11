@@ -148,9 +148,6 @@ class eGela:
         print(str(codigo) + " " + descripcion)
         NUMERO_DE_PDF_EN_EGELA = 0
 
-        progress_step = 0
-
-
         print("\n##### Analisis del HTML... #####")
         #############################################
         # ANALISIS DE LA PAGINA DEL AULA EN EGELA
