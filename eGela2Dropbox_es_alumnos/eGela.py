@@ -36,12 +36,12 @@ class eGela:
         galleta = ""
         if 'Location' in respuesta.headers:
             direct = respuesta.headers['Location']
-        if 'set-cookie' in respuesta.headers:
-            galleta = respuesta.headers['set-cookie']
+        if 'Set-Cookie' in respuesta.headers:
+            galleta = respuesta.headers['Set-Cookie']
             galleta = galleta.split(";")[0]
         html_pulido = BeautifulSoup(respuesta.content, "html.parser")
         tokenlogin = html_pulido.find('input', {'name': 'logintoken'})['value']
-        print(direct + " " + galleta)
+        print(uri + " " + galleta)
 
         progress = 25
         progress_var.set(progress)
@@ -51,7 +51,7 @@ class eGela:
         print("\n##### 2. PETICION #####")
         metodo = 'POST'
         cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': galleta}
-        cuerpo = {'logintoken': tokenlogin, 'username': username, 'password': password}
+        cuerpo = {'logintoken': tokenlogin, 'username': username.get(), 'password': password.get()}
         cuerpo_encoded = urllib.parse.urlencode(cuerpo)
         cabeceras['Content-Length'] = str(len(cuerpo_encoded))
         respuesta = requests.request(metodo, uri, data=cuerpo_encoded, headers=cabeceras, allow_redirects=False)
@@ -61,8 +61,8 @@ class eGela:
         galleta = ""
         if 'Location' in respuesta.headers:
             direct = respuesta.headers['Location']
-        if 'set-cookie' in respuesta.headers:
-            galleta = respuesta.headers['set-cookie']
+        if 'Set-Cookie' in respuesta.headers:
+            galleta = respuesta.headers['Set-Cookie']
             galleta = galleta.split(";")[0]
         print(direct + " " + galleta)
         if 'testsession' in direct:
@@ -126,13 +126,10 @@ class eGela:
         progress_bar.update()
 
         print("\n##### 4. PETICION (Página principal de la asignatura en eGela) #####")
-        #############################################
-        # RELLENAR CON CODIGO DE LA PETICION HTTP
-        # Y PROCESAMIENTO DE LA RESPUESTA HTTP:
 
+        #buscamos enlace de curso de sw en la pagina de egela
         doc = BeautifulSoup(self._curso, 'html.parser')
         enlaces = doc.html.body.find_all('a')
-        # print(divs)
         for e in enlaces:
             if e.text == 'Sistemas Web':
                 self._curso = e['href']
@@ -151,7 +148,7 @@ class eGela:
         print(str(codigo) + " " + descripcion)
         NUMERO_DE_PDF_EN_EGELA = 0
 
-        progress_step = float(100.0 / len(NUMERO_DE_PDF_EN_EGELA))
+        progress_step = 0
 
 
         print("\n##### Analisis del HTML... #####")
@@ -161,24 +158,23 @@ class eGela:
 
         doc = BeautifulSoup(cuerpo, 'html.parser')
         enlaces = doc.html.body.find_all('a', {'class': 'aalink'})
-        listaPDFs = []
         for e in enlaces:
             if 'Fitxategia' in e.span.text and 'pdf' in e.img['src']:
                 self._refs.append(e['href'])
                 NUMERO_DE_PDF_EN_EGELA += 1
 
-        # INICIALIZA Y ACTUALIZAR BARRA DE PROGRESO
-        # POR CADA PDF ANIADIDO EN self._refs
+                # INICIALIZA Y ACTUALIZAR BARRA DE PROGRESO
+                # POR CADA PDF ANIADIDO EN self._refs
 
-        progress_step = float(100.0 / len(NUMERO_DE_PDF_EN_EGELA))
+                progress_step = float(100.0 / len(NUMERO_DE_PDF_EN_EGELA))
 
+                progress += progress_step
+                progress_var.set(progress)
+                progress_bar.update()
+                time.sleep(0.1)
 
-        progress += progress_step
-        progress_var.set(progress)
-        progress_bar.update()
-        time.sleep(0.1)
+                popup.destroy()
 
-        popup.destroy()
         return self._refs
 
     def get_pdf(self, selection):
