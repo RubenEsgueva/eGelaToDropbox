@@ -130,7 +130,7 @@ class eGela:
         print("\n##### 4. PETICION (Página principal de la asignatura en eGela) #####")
 
         #buscamos enlace de curso de sw en la pagina de egela
-        doc = BeautifulSoup(self._curso, 'html.parser')
+        doc = BeautifulSoup(self._webegela, 'html.parser')
         enlaces = doc.html.body.find_all('a')
         for e in enlaces:
             if e.text == 'Sistemas Web':
@@ -148,7 +148,7 @@ class eGela:
         descripcion = respuesta.reason
         cuerpo = respuesta.content
         print(str(codigo) + " " + descripcion)
-        NUMERO_DE_PDF_EN_EGELA = 0
+
 
         print("\n##### Analisis del HTML... #####")
         #############################################
@@ -157,9 +157,11 @@ class eGela:
 
         doc = BeautifulSoup(cuerpo, 'html.parser')
         enlaces = doc.html.body.find_all('a', {'class': 'aalink'})
+        NUMERO_DE_PDF_EN_EGELA = len(enlaces)
         for e in enlaces:
             if 'Fitxategia' in e.span.text and 'pdf' in e.img['src']:
-                nombre = e['instancename']
+                span_element = e.find('span', class_='instancename')
+                nombre = span_element.text
                 link = e['href']
                 par = {'pdf_name': nombre, 'pdf_link': link}
                 par = json.dumps(par)
@@ -169,15 +171,14 @@ class eGela:
                 # INICIALIZA Y ACTUALIZAR BARRA DE PROGRESO
                 # POR CADA PDF ANIADIDO EN self._refs
 
-                progress_step = float(100.0 / len(NUMERO_DE_PDF_EN_EGELA))
+                progress_step = float(100.0 / NUMERO_DE_PDF_EN_EGELA)
 
                 progress += progress_step
                 progress_var.set(progress)
                 progress_bar.update()
                 time.sleep(0.1)
 
-                popup.destroy()
-
+        popup.destroy()
         return self._refs
 
     def get_pdf(self, selection):
