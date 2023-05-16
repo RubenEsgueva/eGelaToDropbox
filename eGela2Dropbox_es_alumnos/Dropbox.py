@@ -7,7 +7,7 @@ import helper
 
 app_key = 'b1dlpgsyw25fn6u'
 app_secret = 'htvp4dr57dk27xr'
-server_addr = "localhost"
+server_addr = "localHost"
 server_port = 8090
 redirect_uri = "http://" + server_addr + ":" + str(server_port)
 
@@ -23,6 +23,14 @@ class Dropbox:
         self._root = root
 
     def local_server(self):
+        servidor = 'www.dropbox.com'
+        params = {'response_type': 'code', 'client_id': app_key, 'redirect_uri': redirect_uri}
+
+        params_encoded = urllib.parse.urlencode(params)
+        recurso = '/oauth2/authorize?' + params_encoded
+        uri = 'http://' + servidor + recurso
+        webbrowser.open_new(uri)
+
         # por el puerto 8090 esta escuchando el servidor que generamos
         server_socket = socket(AF_INET, SOCK_STREAM)
         server_socket.bind((server_addr, server_port))
@@ -47,7 +55,7 @@ class Dropbox:
                         "<head><title>Proba</title></head>" \
                         "<body>The authentication flow has completed. Close this window.</body>" \
                         "</html>"
-        client_connection.sendall(http_response)
+        client_connection.sendall(http_response.encode(encoding="utf-8"))
         client_connection.close()
         server_socket.close()
 
