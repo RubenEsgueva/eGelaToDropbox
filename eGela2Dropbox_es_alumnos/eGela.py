@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+import json
+import os
 from tkinter import messagebox
 import requests
 import urllib
@@ -157,7 +159,11 @@ class eGela:
         enlaces = doc.html.body.find_all('a', {'class': 'aalink'})
         for e in enlaces:
             if 'Fitxategia' in e.span.text and 'pdf' in e.img['src']:
-                self._refs.append(e['href'])
+                nombre = e['instancename']
+                link = e['href']
+                par = {'pdf_name': nombre, 'pdf_link': link}
+                par = json.dumps(par)
+                self._refs.append(par)
                 NUMERO_DE_PDF_EN_EGELA += 1
 
                 # INICIALIZA Y ACTUALIZAR BARRA DE PROGRESO
@@ -176,10 +182,23 @@ class eGela:
 
     def get_pdf(self, selection):
 
+        pdfs = self._refs.loads
+        uri_sel = pdfs[selection]['pdf_link']
+        pdf_name = pdfs[selection]['pdf_name']
         print("\t##### descargando  PDF... #####")
         #############################################
-        # RELLENAR CON CODIGO DE LA PETICION HTTP
-        # Y PROCESAMIENTO DE LA RESPUESTA HTTP
-        #############################################
+
+        metodo = 'GET'
+        uri = uri_sel
+        cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': self._cookie}
+        respuesta = requests.request(metodo, uri, headers=cabeceras, allow_redirects=False)
+        nuevaURI = respuesta.headers['Location']
+
+        metodo = 'GET'
+        uri = nuevaURI
+        cabeceras = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded', 'Cookie': self._cookie}
+        respuesta = requests.request(metodo, uri, headers=cabeceras, allow_redirects=False)
+
+        pdf_content = respuesta.content
 
         return pdf_name, pdf_content
