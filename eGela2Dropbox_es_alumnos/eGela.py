@@ -183,9 +183,10 @@ class eGela:
 
     def get_pdf(self, selection):
 
-        pdfs = self._refs.loads
-        uri_sel = pdfs[selection]['pdf_link']
-        pdf_name = pdfs[selection]['pdf_name']
+        pdf = self._refs[selection]
+        pdf = json.loads(pdf)
+        uri_sel = pdf['pdf_link']
+        pdf_name = pdf['pdf_name']
         print("\t##### descargando  PDF... #####")
         #############################################
 

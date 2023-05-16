@@ -10,6 +10,7 @@ from urllib.parse import unquote
 
 ##########################################################################################################
 
+
 def make_entry(parent, caption, width=None, **options):
     label = tk.Label(parent, text=caption)
     label.pack(side=tk.TOP)
@@ -17,6 +18,7 @@ def make_entry(parent, caption, width=None, **options):
     entry.config(width=width)
     entry.pack(side=tk.TOP, padx=10, fill=tk.BOTH)
     return entry
+
 
 def make_listbox(messages_frame):
     messages_frame.config(bd=1, relief="ridge")
@@ -26,6 +28,7 @@ def make_listbox(messages_frame):
     scrollbar.configure(command=msg_listbox.yview)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     return msg_listbox
+
 
 def transfer_files():
     popup, progress_var, progress_bar = helper.progress("transfer_file", "Transfering files...")
@@ -60,6 +63,7 @@ def transfer_files():
     dropbox.list_folder(msg_listbox2)
     msg_listbox2.yview(tk.END)
 
+
 def delete_files():
     popup, progress_var, progress_bar = helper.progress("delete_file", "Deleting files...")
     progress = 0
@@ -72,7 +76,7 @@ def delete_files():
             path = "/" + dropbox._files[each]['name']
         else:
             path = dropbox._path + "/" + dropbox._files[each]['name']
-            print (path)
+            print(path)
         dropbox.delete_file(path)
 
         progress += progress_step
@@ -81,6 +85,7 @@ def delete_files():
 
     popup.destroy()
     dropbox.list_folder(msg_listbox2)
+
 
 def name_folder(folder_name):
     if dropbox._path == "/":
@@ -91,6 +96,40 @@ def name_folder(folder_name):
     var.set(dropbox._path)
     dropbox._root.destroy()
     dropbox.list_folder(msg_listbox2)
+
+
+def select_folder(folder_name, method):
+    popup, progress_var, progress_bar = helper.progress("file_processor", "Processing files...")
+    progress = 0
+    progress_var.set(progress)
+    progress_bar.update()
+    progress_step = float(100.0 / len(selected_items2))
+
+    for each in selected_items2:
+        if dropbox._path == "/":
+            path = "/" + dropbox._files[each]['name']
+        else:
+            path = dropbox._path + "/" + dropbox._files[each]['name']
+            print(path)
+        folder_name = folder_name + "/" + dropbox._files[each]['name']
+        if method == "Copiar":
+            dropbox.copy_file(path, folder_name)
+        elif method == "Mover":
+            dropbox.move_file(path, folder_name)
+
+        progress += progress_step
+        progress_var.set(progress)
+        progress_bar.update()
+        newroot.update()
+
+        time.sleep(0.1)
+
+    popup.destroy()
+    var.set(dropbox._path)
+    dropbox._root.destroy()
+    dropbox.list_folder(msg_listbox2)
+    msg_listbox2.yview(tk.END)
+
 
 def create_folder():
     popup = tk.Toplevel(newroot)
@@ -114,20 +153,67 @@ def create_folder():
 
 ##########################################################################################################
 
-def check_credentials(event= None):
+def move_file():
+    popup = tk.Toplevel(newroot)
+    popup.geometry('200x100')
+    popup.title('Dropbox')
+    popup.iconbitmap('./favicon.ico')
+    helper.center(popup)
+
+    login_frame = tk.Frame(popup, padx=10, pady=10)
+    login_frame.pack(fill=tk.BOTH, expand=True)
+
+    label = tk.Label(login_frame, text="Move to")
+    label.pack(side=tk.TOP)
+    entry_field = tk.Entry(login_frame, width=35)
+    entry_field.bind("<Return>", select_folder)
+    entry_field.pack(side=tk.TOP)
+    send_button = tk.Button(login_frame, text="Send", command=lambda: select_folder(entry_field.get(), "Mover"))
+    send_button.pack(side=tk.TOP)
+    dropbox._root = popup
+
+
+##########################################################################################################
+def copy_file():
+    popup = tk.Toplevel(newroot)
+    popup.geometry('200x100')
+    popup.title('Dropbox')
+    popup.iconbitmap('./favicon.ico')
+    helper.center(popup)
+
+    login_frame = tk.Frame(popup, padx=10, pady=10)
+    login_frame.pack(fill=tk.BOTH, expand=True)
+
+    label = tk.Label(login_frame, text="Copy To")
+    label.pack(side=tk.TOP)
+    entry_field = tk.Entry(login_frame, width=35)
+    entry_field.bind("<Return>", select_folder)
+    entry_field.pack(side=tk.TOP)
+    send_button = tk.Button(login_frame, text="Send", command=lambda: select_folder(entry_field.get(), "Copiar"))
+    send_button.pack(side=tk.TOP)
+    dropbox._root = popup
+
+
+##########################################################################################################
+
+
+def check_credentials(event=None):
     egela.check_credentials(username, password)
+
 
 def on_selecting1(event):
     global selected_items1
     widget = event.widget
     selected_items1 = widget.curselection()
-    print (selected_items1)
+    print(selected_items1)
+
 
 def on_selecting2(event):
     global selected_items2
     widget = event.widget
     selected_items2 = widget.curselection()
-    print (selected_items2)
+    print(selected_items2)
+
 
 def on_double_clicking2(event):
     widget = event.widget
@@ -146,9 +232,11 @@ def on_double_clicking2(event):
     dropbox.list_folder(msg_listbox2)
 ##########################################################################################################
 # Login eGela
+
+
 root = tk.Tk()
 root.geometry('250x150')
-root.iconbitmap('./favicon.ico') #
+root.iconbitmap('./favicon.ico')  #
 root.title('Login eGela')
 helper.center(root)
 egela = eGela.eGela(root)
@@ -195,8 +283,8 @@ root.mainloop()
 
 newroot = tk.Tk()
 newroot.geometry("850x400")
-newroot.iconbitmap('./favicon.ico') #
-newroot.title("eGela -> Dropbox") #
+newroot.iconbitmap('./favicon.ico')  #
+newroot.title("eGela -> Dropbox")  #
 helper.center(newroot)
 
 newroot.rowconfigure(0, weight=1)
@@ -216,7 +304,7 @@ label2.grid(column=0, row=0, ipadx=5, ipady=5)
 var = tk.StringVar()
 var.set(dropbox._path)
 label = tk.Label(newroot, textvariable=var)
-label.grid( row=0, column=2, ipadx=5, ipady=5)
+label.grid(row=0, column=2, ipadx=5, ipady=5)
 
 # Frame con lista de PDFs e eGela (1,0)
 selected_items1 = None
@@ -224,8 +312,8 @@ messages_frame1 = tk.Frame(newroot)
 msg_listbox1 = make_listbox(messages_frame1)
 msg_listbox1.bind('<<ListboxSelect>>', on_selecting1)
 msg_listbox1.pack(side=tk.LEFT, fill=tk.BOTH)
-#messages_frame1.pack()
-messages_frame1.grid(row=1, column=0, ipadx=10, ipady=10, padx=2, pady=2) #
+# messages_frame1.pack()
+messages_frame1.grid(row=1, column=0, ipadx=10, ipady=10, padx=2, pady=2)  #
 
 # Frame con boton >>> (1,1)
 frame1 = tk.Frame(newroot)
@@ -241,7 +329,7 @@ msg_listbox2.bind('<<ListboxSelect>>', on_selecting2)
 msg_listbox2.bind('<Double-Button-1>', on_double_clicking2)
 msg_listbox2.pack(side=tk.RIGHT, fill=tk.BOTH)
 
-#messages_frame2.pack()
+# messages_frame2.pack()
 messages_frame2.grid(row=1, column=2, ipadx=10, ipady=10, padx=2, pady=2)
 
 # Frame con botones Create y Delete (1,3)
@@ -251,6 +339,10 @@ button2 = tk.Button(frame2, borderwidth=4, text="Delete", width=10, pady=8, comm
 button2.pack(padx=2, pady=2)
 button3 = tk.Button(frame2, borderwidth=4, text="Create folder", width=10, pady=8, command=create_folder)
 button3.pack(padx=2, pady=2)
+button4 = tk.Button(frame2, borderwidth=4, text="Move File", width=10, pady=8, command=move_file)
+button4.pack(padx=2, pady=2)
+button5 = tk.Button(frame2, borderwidth=4, text="Copy File", width=10, pady=8, command=copy_file)
+button5.pack(padx=2, pady=2)
 frame2.grid(row=1, column=3,  ipadx=10, ipady=10)
 
 for each in pdfs:

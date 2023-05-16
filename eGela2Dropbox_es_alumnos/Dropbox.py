@@ -5,8 +5,8 @@ from socket import AF_INET, socket, SOCK_STREAM
 import json
 import helper
 
-app_key = 'y9qkbbxfhdib7r3'
-app_secret = 'p1krj5l6hncuz0u'
+app_key = '900vbwtm58pfdka'
+app_secret = 'thicxdwaj6u8ktl'
 server_addr = "localhost"
 server_port = 8090
 redirect_uri = "http://" + server_addr + ":" + str(server_port)
@@ -78,7 +78,9 @@ class Dropbox:
         print("/list_folder")
         uri = 'https://api.dropboxapi.com/2/files/list_folder'
         access_token = self._access_token
-        datos = {'path': msg_listbox}
+        if self._path == "/":
+            self._path = ""
+        datos = {'path': self._path}
         datos_encoded = json.dumps(datos)
 
         print("Datos: " + datos_encoded)
@@ -97,10 +99,8 @@ class Dropbox:
 
         self._files = helper.update_listbox2(msg_listbox, self._path, contenido_json)
 
-    def transfer_file(self, file_path, a_subir):
+    def transfer_file(self, file_path, file_data):
         print("/upload")
-        with open(a_subir, "r") as archivo:
-            file_data = archivo.read()
         uri = "https://content.dropboxapi.com/2/files/upload"
         access_token = self._access_token
         dropbox_api_arg = {'path': file_path, 'mode': 'add', 'autorename': True, 'mute': False, }
@@ -123,6 +123,39 @@ class Dropbox:
         uri = 'https://api.dropboxapi.com/2/files/delete_v2'
         access_token = self._access_token
         datos = {'path': file_path}
+        datos_encoded = json.dumps(datos)
+
+        print("Datos: " + datos_encoded)
+        cabeceras = {'Host': 'api.dropboxapi.com', 'Authorization': 'Bearer ' + access_token,
+                     'Content-Type': 'application/json'}
+        respuesta = requests.post(uri, headers=cabeceras, data=datos_encoded, allow_redirects=False)
+
+        status = respuesta.status_code
+        print("\tStatus: " + str(status))
+        print("\tReason: " + respuesta.reason)
+
+    def copy_file(self, file_path, folder_name):
+        print("/copy_file")
+        uri = 'https://api.dropboxapi.com/2/files/copy_v2'
+        access_token = self._access_token
+        datos = {'allow_ownership_transfer': False, 'allow_shared_folder': True, 'autorename': False,
+                 'from_path': file_path, 'to_path': folder_name}
+        datos_encoded = json.dumps(datos)
+        print("Datos: " + datos_encoded)
+        cabeceras = {'Host': 'api.dropboxapi.com', 'Authorization': 'Bearer ' + access_token,
+                     'Content-Type': 'application/json'}
+        respuesta = requests.post(uri, headers=cabeceras, data=datos_encoded, allow_redirects=False)
+
+        status = respuesta.status_code
+        print("\tStatus: " + str(status))
+        print("\tReason: " + respuesta.reason)
+
+    def move_file(self, file_path, folder_name):
+        print("/move_file")
+        uri = 'https://api.dropboxapi.com/2/files/move_v2'
+        access_token = self._access_token
+        datos = {'allow_ownership_transfer': False, 'allow_shared_folder': True, 'autorename': True,
+                 'from_path': file_path, 'to_path': folder_name}
         datos_encoded = json.dumps(datos)
 
         print("Datos: " + datos_encoded)
