@@ -5,6 +5,7 @@ import eGela
 import Dropbox
 import helper
 import time
+import json
 from urllib.parse import unquote
 
 ##########################################################################################################
@@ -41,7 +42,7 @@ def transfer_files():
 
         if dropbox._path == "/":
             path = "/" + unquote(pdf_name)
-            print ("----------------------: "+ pdf_name)
+            print("----------------------: " + pdf_name)
             print("----------------------: " + unquote(pdf_name))
 
         else:
@@ -253,6 +254,7 @@ button3.pack(padx=2, pady=2)
 frame2.grid(row=1, column=3,  ipadx=10, ipady=10)
 
 for each in pdfs:
+    each = json.loads(each)
     msg_listbox1.insert(tk.END, each['pdf_name'])
     msg_listbox1.yview(tk.END)
 

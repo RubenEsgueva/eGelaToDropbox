@@ -159,7 +159,7 @@ class eGela:
         enlaces = doc.html.body.find_all('a', {'class': 'aalink'})
         NUMERO_DE_PDF_EN_EGELA = len(enlaces)
         for e in enlaces:
-            if 'Fitxategia' in e.span.text and 'pdf' in e.img['src']:
+            if e.img['src'].endswith("pdf"):
                 span_element = e.find('span', class_='instancename')
                 nombre = span_element.text
                 link = e['href']
