@@ -7,7 +7,7 @@ import helper
 
 app_key = 'b1dlpgsyw25fn6u'
 app_secret = 'htvp4dr57dk27xr'
-server_addr = "localHost"
+server_addr = "localhost"
 server_port = 8090
 redirect_uri = "http://" + server_addr + ":" + str(server_port)
 
