@@ -221,11 +221,10 @@ class Dropbox:
 
         headers = {
             "Authorization": "Bearer " + self._access_token,
-            "Dropbox-API-Arg": {"path": path}
+            "Dropbox-API-Arg": json.dumps({"path": path})
         }
 
 
         r = requests.post(url, headers=headers, allow_redirects= False)
-        print(r)
         with open(nombre, "wb") as f:
-            f.write(r.text)
+            f.write(r.content)
