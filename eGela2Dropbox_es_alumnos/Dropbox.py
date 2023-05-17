@@ -214,18 +214,18 @@ class Dropbox:
         return paths
 
     def download(self, nombre, selection):
-
+        print("/download")
         path = self.search(selection)[0]
-        print(path)
 
         url = "https://content.dropboxapi.com/2/files/download"
 
         headers = {
-            "Authorization": "Bearer " + self._access_token,
+            "Authorization": "Bearer " + self._access_token
             "Dropbox-API-Arg": {"path": path}
         }
 
-        r = requests.post(url, headers=headers)
-        print(r.content)
+
+        r = requests.post(url, headers=headers, allow_redirects= False)
+        print(r)
         with open(nombre, "wb") as f:
             f.write(r.text)
