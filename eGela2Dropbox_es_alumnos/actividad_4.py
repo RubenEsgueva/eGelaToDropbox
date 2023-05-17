@@ -8,6 +8,7 @@ import time
 import json
 from urllib.parse import unquote
 
+
 ##########################################################################################################
 
 
@@ -149,6 +150,47 @@ def create_folder():
     send_button = tk.Button(login_frame, text="Send", command=lambda: name_folder(entry_field.get()))
     send_button.pack(side=tk.TOP)
     dropbox._root = popup
+
+##########################################################################################################
+
+def search():
+    popup = tk.Toplevel(newroot)
+    popup.geometry('200x100')
+    popup.title('Dropbox')
+    popup.iconbitmap('./favicon.ico')
+    helper.center(popup)
+
+    login_frame = tk.Frame(popup, padx=10, pady=10)
+    login_frame.pack(fill=tk.BOTH, expand=True)
+
+    label = tk.Label(login_frame, text="Search file")
+    label.pack(side=tk.TOP)
+    entry_field = tk.Entry(login_frame, width=35)
+    entry_field.bind("<Return>", search)
+    entry_field.pack(side=tk.TOP)
+    send_button = tk.Button(login_frame, text="Search", command=lambda: mostrar_paths(entry_field.get()))
+    send_button.pack(side=tk.TOP)
+    dropbox._root = popup
+
+##########################################################################################################
+
+def mostrar_paths(file):
+    paths = dropbox.search(file)
+
+    # Crear la nueva ventana
+    list_window = tk.Toplevel(newroot)
+    list_window.title('Paths')
+
+    # Crear el widget de texto
+    text_widget = tk.Text(list_window)
+    text_widget.pack()
+
+    # Obtener los valores de la lista y agregarlos al widget de texto
+    for p in paths:
+        text_widget.insert(tk.END, str(p) + "\n")
+
+    # Hacer que la ventana sea visible
+    list_window.mainloop()
 
 
 ##########################################################################################################
@@ -343,6 +385,8 @@ button4 = tk.Button(frame2, borderwidth=4, text="Move File", width=10, pady=8, c
 button4.pack(padx=2, pady=2)
 button5 = tk.Button(frame2, borderwidth=4, text="Copy File", width=10, pady=8, command=copy_file)
 button5.pack(padx=2, pady=2)
+button6 = tk.Button(frame2, borderwidth=4, text="Search", width=10, pady=8, command=search)
+button6.pack(padx=2, pady=2)
 frame2.grid(row=1, column=3,  ipadx=10, ipady=10)
 
 for each in pdfs:

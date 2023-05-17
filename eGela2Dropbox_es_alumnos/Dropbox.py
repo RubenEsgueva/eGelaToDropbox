@@ -182,3 +182,33 @@ class Dropbox:
         status = respuesta.status_code
         print("\tStatus: " + str(status))
         print("\tReason: " + respuesta.reason)
+
+    def search(self, file):
+        print("/search")
+        uri = 'https://api.dropboxapi.com/2/files/search_v2'
+        access_token = self._access_token
+        datos = {"match_field_options": {
+                    "include_highlights": False},
+                 "options": {
+                     "file_status": "active",
+                     "filename_only": False,
+                     "max_results": 20,
+                     "path": "/"
+                 },
+                 "query": file}
+        datos_encoded = json.dumps(datos)
+
+        print("Datos: " + datos_encoded)
+        cabeceras = {'Host': 'api.dropboxapi.com', 'Authorization': 'Bearer ' + access_token,
+                     'Content-Type': 'application/json'}
+        respuesta = requests.post(uri, headers=cabeceras, data=datos_encoded, allow_redirects=False)
+
+        status = respuesta.status_code
+        print("\tStatus: " + str(status))
+        print("\tReason: " + respuesta.reason)
+
+        datos = json.loads(respuesta.text)
+        matches = datos['matches']
+        paths = []
+        paths = [match['metadata']['metadata']['path_display'] for match in matches]
+        return paths
