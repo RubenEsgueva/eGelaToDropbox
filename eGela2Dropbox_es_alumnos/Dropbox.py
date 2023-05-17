@@ -220,7 +220,7 @@ class Dropbox:
         url = "https://content.dropboxapi.com/2/files/download"
 
         headers = {
-            "Authorization": "Bearer " + self._access_token
+            "Authorization": "Bearer " + self._access_token,
             "Dropbox-API-Arg": {"path": path}
         }
 
