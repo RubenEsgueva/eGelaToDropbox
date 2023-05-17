@@ -253,9 +253,13 @@ def download():
     entry_field.bind("<Return>", select_folder)
     entry_field.pack(side=tk.TOP)
     print(selected_items2)
-    send_button = tk.Button(login_frame, text="Save", command=lambda: dropbox.download(entry_field.get(), dropbox._files[selected_items2[0]]['name']))
+    send_button = tk.Button(login_frame, text="Save", command=lambda: download_aux(popup, entry_field.get()))
     send_button.pack(side=tk.TOP)
     dropbox._root = popup
+
+def download_aux(window, nombre):
+    dropbox.download(nombre, dropbox._files[selected_items2[0]]['name'])
+    window.destroy()
 
 ##########################################################################################################
 
