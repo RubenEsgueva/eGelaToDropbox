@@ -192,7 +192,6 @@ def mostrar_paths(file):
     # Hacer que la ventana sea visible
     list_window.mainloop()
 
-
 ##########################################################################################################
 
 def move_file():
@@ -235,6 +234,29 @@ def copy_file():
     send_button.pack(side=tk.TOP)
     dropbox._root = popup
 
+##########################################################################################################
+
+def download():
+    popup = tk.Toplevel(newroot)
+    popup.geometry('200x100')
+    popup.title('Dropbox')
+    popup.iconbitmap('./favicon.ico')
+    helper.center(popup)
+
+    login_frame = tk.Frame(popup, padx=10, pady=10)
+    login_frame.pack(fill=tk.BOTH, expand=True)
+
+    label = tk.Label(login_frame, text="Name")
+    label.pack(side=tk.TOP)
+    entry_field = tk.Entry(login_frame, width=35)
+    entry_field.insert(0, '.pdf')
+    entry_field.bind("<Return>", select_folder)
+    entry_field.pack(side=tk.TOP)
+    print(selected_items2)
+    send_button = tk.Button(login_frame, text="Save", command=lambda: dropbox.download(entry_field.get(), selected_items2))
+
+    send_button.pack(side=tk.TOP)
+    dropbox._root = popup
 
 ##########################################################################################################
 
@@ -387,6 +409,8 @@ button5 = tk.Button(frame2, borderwidth=4, text="Copy File", width=10, pady=8, c
 button5.pack(padx=2, pady=2)
 button6 = tk.Button(frame2, borderwidth=4, text="Search", width=10, pady=8, command=search)
 button6.pack(padx=2, pady=2)
+button7 = tk.Button(frame2, borderwidth=4, text="Download", width=10, pady=8, command=download)
+button7.pack(padx=2, pady=2)
 frame2.grid(row=1, column=3,  ipadx=10, ipady=10)
 
 for each in pdfs:

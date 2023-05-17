@@ -212,3 +212,20 @@ class Dropbox:
         paths = []
         paths = [match['metadata']['metadata']['path_display'] for match in matches]
         return paths
+
+    def download(self, nombre, selection):
+
+        path = self.search(selection)[0]
+        print(path)
+
+        url = "https://content.dropboxapi.com/2/files/download"
+
+        headers = {
+            "Authorization": "Bearer " + self._access_token,
+            "Dropbox-API-Arg": {"path": path}
+        }
+
+        r = requests.post(url, headers=headers)
+        print(r.content)
+        with open(nombre, "wb") as f:
+            f.write(r.text)
